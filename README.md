@@ -56,7 +56,7 @@ The key is only read on the server. Never give it a `VITE_` prefix, because Vite
 
 ## Running without a key
 
-The demo always works. If the key is missing or a Fireworks call fails, `/api/extract` returns realistic mock data instead. The review screen shows **DeepSeek V4.1 Flash** when the model read the document and **Demo extraction** when the values are mock data, so the two can't be confused. The seeded documents are fake, so they always show **Demo extraction**. The sample images have matching mock values, and any other file gets plausible invented ones.
+The demo always works. If the key is missing or a Fireworks call fails, `/api/extract` returns realistic mock data instead. The review screen and audit log show **DeepSeek V4.1 Flash** when the model read the document and **Demo extraction** when an upload fell back to mock data, so the two can't be confused. Seeded documents show a neutral **Imported** label instead. The sample images have matching mock values, and any other file gets plausible invented ones.
 
 ## Stack
 

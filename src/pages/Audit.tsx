@@ -12,7 +12,9 @@ import { Avatar, Badge, Button, Card, EmptyState, PageHeader, Pager, Select, use
 
 const ACTIONS: Record<AuditAction, { label: string; tone: Tone }> = {
   upload: { label: 'Upload', tone: 'neutral' },
-  ai_extraction: { label: 'AI extraction', tone: 'brand' },
+  ai_extraction: { label: 'DeepSeek V4.1 Flash', tone: 'brand' },
+  demo_extraction: { label: 'Demo extraction', tone: 'warn' },
+  seed_import: { label: 'Imported', tone: 'neutral' },
   edit: { label: 'Edit', tone: 'info' },
   approve: { label: 'Approval', tone: 'good' },
   reject: { label: 'Rejection', tone: 'bad' },

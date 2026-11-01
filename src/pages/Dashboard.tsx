@@ -25,6 +25,8 @@ import { Avatar, Badge, Card, CardHeader, ConfidenceChip, EmptyState, KPI, LinkB
 const ACTIVITY: Record<AuditAction, typeof Upload> = {
   upload: FileUp,
   ai_extraction: Sparkles,
+  demo_extraction: Sparkles,
+  seed_import: FileUp,
   edit: Pencil,
   approve: CheckCircle2,
   reject: XCircle,

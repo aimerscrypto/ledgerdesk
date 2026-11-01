@@ -1,7 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { AlertTriangle, ArrowLeft, Check, ChevronLeft, ChevronRight, Copy, FileQuestion, Info, Loader2, ShieldCheck, Sparkles, X } from 'lucide-react'
-import { CATEGORIES, extractionLabel } from '../../api/_lib/mock-extraction'
+import { CATEGORIES, extractionLabel, type ExtractionResult } from '../../api/_lib/mock-extraction'
 import type { Currency, DocFields, DocRecord, EntryType, ExtractedField } from '../lib/types'
 import { approveDocument, rejectDocument } from '../lib/actions'
 import { LOW_CONFIDENCE, clientById, docFields, findDuplicate, reviewQueue } from '../lib/selectors'
@@ -9,7 +9,9 @@ import { useAppState } from '../lib/store'
 import { fmtAmount, fmtDate, fmtDateTime, fmtMoney, isoDate, round2, toKYD } from '../lib/format'
 import { DocumentPreview } from '../components/DocumentPreview'
 import { Thread } from '../components/Thread'
-import { Badge, Button, Card, CardHeader, ConfidenceChip, EmptyState, Field, IconButton, LinkButton, Modal, Segmented, Select, StatusBadge, cx } from '../components/ui'
+import { Badge, Button, Card, CardHeader, ConfidenceChip, EmptyState, Field, IconButton, LinkButton, Modal, Segmented, Select, StatusBadge, cx, type Tone } from '../components/ui'
+
+const EXTRACTION_TONE: Record<ExtractionResult['source'], Tone> = { fireworks: 'brand', mock: 'warn', seed: 'neutral' }
 
 /** Money is edited as text, so "12." doesn't jump around while someone is typing. */
 interface FormState {
@@ -156,7 +158,7 @@ function ReviewForm({ doc, onDone }: { doc: DocRecord; onDone: () => void }) {
         description={
           extraction ? (
             <span className="inline-flex flex-wrap items-center gap-x-1.5 gap-y-1">
-              <Badge tone={extraction.source === 'fireworks' ? 'brand' : 'warn'} icon={Sparkles}>
+              <Badge tone={EXTRACTION_TONE[extraction.source]} icon={extraction.source === 'seed' ? undefined : Sparkles}>
                 {extractionLabel(extraction)}
               </Badge>
               {extraction.source === 'mock' && 'Sample values, not read from this document by AI'}

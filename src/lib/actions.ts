@@ -11,7 +11,7 @@ import type {
   Statement,
 } from './types'
 import { getPreview, getState, resetState, savePreview, setState } from './store'
-import { ACCOUNTANT, AI_ACTOR, buildStatementLines, extractionFromPaper, statementFingerprint } from './seed'
+import { ACCOUNTANT, AI_ACTOR, IMPORT_ACTOR, buildStatementLines, extractionFromPaper, statementFingerprint } from './seed'
 import { createRng, fmtAmount, periodOf, uid } from './format'
 import { autoMatch } from './matching'
 import { prepareUpload } from './images'
@@ -68,14 +68,14 @@ function finishExtraction(docId: string, extraction: DocRecord['extraction']) {
   const doc = state.documents.find((d) => d.id === docId)
   // The document may have been wiped by a reset while the model was working.
   if (!doc || doc.status !== 'processing') return
-  setState((s) =>
-    withAudit(patchDoc(s, docId, { status: 'needs_review', extraction }), [
-      'ai_extraction',
-      `Extracted ${extraction.vendor || 'unknown vendor'}, ${extraction.currency} ${fmtAmount(extraction.total)} (${Math.round(extraction.confidence * 100)}% confidence) via ${extractionLabel(extraction)}`,
-      SYSTEM_ACTOR,
-      { clientId: doc.clientId, docId },
-    ]),
-  )
+  const summary = `${extraction.vendor || 'unknown vendor'}, ${extraction.currency} ${fmtAmount(extraction.total)} (${Math.round(extraction.confidence * 100)}% confidence)`
+  const event: [AuditAction, string, { name: string; role: 'system' }] =
+    extraction.source === 'fireworks'
+      ? ['ai_extraction', `Extracted ${summary} via ${extractionLabel(extraction)}`, SYSTEM_ACTOR]
+      : extraction.source === 'seed'
+        ? ['seed_import', `Imported ${summary}`, { name: IMPORT_ACTOR, role: 'system' }]
+        : ['demo_extraction', `Filled ${summary} via ${extractionLabel(extraction)}`, { name: IMPORT_ACTOR, role: 'system' }]
+  setState((s) => withAudit(patchDoc(s, docId, { status: 'needs_review', extraction }), [...event, { clientId: doc.clientId, docId }]))
   toast.info(`${doc.filename} has been read`, 'It is now waiting for the accountant to review it.')
 }
 

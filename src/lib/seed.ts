@@ -17,10 +17,11 @@ import type {
 import { addMonths, convert, createRng, isoDate, lastDayOf, parseDate, periodOf, round2, type Rng } from './format'
 import { autoMatch } from './matching'
 
-export const STATE_VERSION = 1
+export const STATE_VERSION = 2
 export const ACCOUNTANT = 'Marcia Ebanks'
 const STAFF = 'Devon Tibbetts'
 export const AI_ACTOR = 'LedgerDesk AI'
+export const IMPORT_ACTOR = 'LedgerDesk'
 
 export const FIRM = {
   name: 'Harbourline Accounting',
@@ -403,7 +404,7 @@ function readPaper(paper: Paper, rng: Rng, misread?: Misread): ExtractionResult 
       break
   }
   const fieldConfidence = fieldScores(rng, low)
-  return { ...fields, confidence: overall(fieldConfidence), fieldConfidence, source: 'mock' }
+  return { ...fields, confidence: overall(fieldConfidence), fieldConfidence, source: 'seed' }
 }
 
 function swapDigits(n: number): number {
@@ -584,7 +585,7 @@ export function buildState(now: Date = new Date()): AppState {
           })
 
           log({ at: uploadedAt, actor: c.contact, actorRole: 'client', action: 'upload', clientId: c.id, docId, detail: `Uploaded ${filename}` })
-          log({ at: new Date(new Date(uploadedAt).getTime() + 14_000).toISOString(), actor: AI_ACTOR, actorRole: 'system', action: 'ai_extraction', clientId: c.id, docId, detail: `Extracted ${paper.vendor}, ${paper.currency} ${paper.total.toFixed(2)} (${Math.round(extraction.confidence * 100)}% confidence)` })
+          log({ at: new Date(new Date(uploadedAt).getTime() + 14_000).toISOString(), actor: IMPORT_ACTOR, actorRole: 'system', action: 'seed_import', clientId: c.id, docId, detail: `Imported ${paper.vendor}, ${paper.currency} ${paper.total.toFixed(2)} (${Math.round(extraction.confidence * 100)}% confidence)` })
           if (wasEdited) log({ at: reviewedAt, actor: reviewer, actorRole: 'accountant', action: 'edit', clientId: c.id, docId, detail: `Changed category from "Office & software" to "${paper.category}"` })
           log({ at: reviewedAt, actor: reviewer, actorRole: 'accountant', action: 'approve', clientId: c.id, docId, detail: `Approved ${paper.vendor}, ${paper.currency} ${paper.total.toFixed(2)} and posted to ledger` })
         }
@@ -618,7 +619,7 @@ export function buildState(now: Date = new Date()): AppState {
       })
       pendingInputs.push({ id: docId, date: paper.date, amount: paper.total, currency: paper.currency, type: 'expense', vendor: spec.v, bank: spec.bank })
       log({ at: uploadedAt, actor: c.contact, actorRole: 'client', action: 'upload', clientId: c.id, docId, detail: `Uploaded ${filename}` })
-      log({ at: new Date(new Date(uploadedAt).getTime() + 11_000).toISOString(), actor: AI_ACTOR, actorRole: 'system', action: 'ai_extraction', clientId: c.id, docId, detail: `Extracted ${extraction.vendor}, ${extraction.currency} ${extraction.total.toFixed(2)} (${Math.round(extraction.confidence * 100)}% confidence)` })
+      log({ at: new Date(new Date(uploadedAt).getTime() + 11_000).toISOString(), actor: IMPORT_ACTOR, actorRole: 'system', action: 'seed_import', clientId: c.id, docId, detail: `Imported ${extraction.vendor}, ${extraction.currency} ${extraction.total.toFixed(2)} (${Math.round(extraction.confidence * 100)}% confidence)` })
     })
 
     // Bank statements: last month fully reconciled, the closing month mid-flight.
@@ -743,7 +744,7 @@ function addScriptedActivity(
       uploadedBy: contact,
       status: 'rejected',
       paper,
-      extraction: { vendor, date, invoiceNumber: paper.number, subtotal: total, tax: 0, total, currency: 'KYD', category, confidence: overall(fieldConfidence), fieldConfidence, source: 'mock' },
+      extraction: { vendor, date, invoiceNumber: paper.number, subtotal: total, tax: 0, total, currency: 'KYD', category, confidence: overall(fieldConfidence), fieldConfidence, source: 'seed' },
       entryType: 'expense',
       reviewedAt: hoursAgo(hours),
       reviewedBy: ACCOUNTANT,

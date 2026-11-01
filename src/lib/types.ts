@@ -120,6 +120,8 @@ export interface Statement {
 export type AuditAction =
   | 'upload'
   | 'ai_extraction'
+  | 'demo_extraction'
+  | 'seed_import'
   | 'edit'
   | 'approve'
   | 'reject'

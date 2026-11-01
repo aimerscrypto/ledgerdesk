@@ -18,13 +18,15 @@ export interface ExtractionResult {
   category: string
   confidence: number
   fieldConfidence: Record<ExtractedField, number>
-  source: 'fireworks' | 'mock'
+  /** fireworks: read by the model. mock: an upload the model couldn't read. seed: seeded demo data. */
+  source: 'fireworks' | 'mock' | 'seed'
   fallbackReason?: 'no_key' | 'api_error' | 'unreachable'
 }
 
 /** The name shown wherever the app says who read a document. */
 export function extractionLabel(result: Pick<ExtractionResult, 'source'>): string {
-  return result.source === 'fireworks' ? 'DeepSeek V4.1 Flash' : 'Demo extraction'
+  if (result.source === 'fireworks') return 'DeepSeek V4.1 Flash'
+  return result.source === 'seed' ? 'Imported' : 'Demo extraction'
 }
 
 export const CATEGORIES = [
