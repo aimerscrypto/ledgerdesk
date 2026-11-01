@@ -1,75 +1,77 @@
 @import 'tailwindcss';
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/inter-tight';
+@import '@fontsource/instrument-serif/400.css';
 
 @custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
 
 /* Semantic tokens: components use these names, and themes only swap the values. */
 :root {
-  --canvas: #f5f7f8;
+  --canvas: #fafaf7;
   --surface: #ffffff;
-  --surface-2: #f1f4f5;
-  --surface-3: #e6ebed;
-  --line: #e1e6e9;
-  --line-strong: #c9d1d6;
-  --ink: #101c24;
-  --ink-2: #47565f;
-  --ink-3: #6b7a84;
-  --brand: #0b5f5a;
-  --brand-hover: #094e4a;
-  --brand-soft: #e3f3f0;
-  --brand-ink: #0a5a55;
+  --surface-2: #f4f3ee;
+  --surface-3: #eae8e1;
+  --line: #e9e7e0;
+  --line-strong: #d3d0c6;
+  --ink: #0f1b2d;
+  --ink-2: #3f4a5a;
+  --ink-3: #5c6573;
+  --brand: #0e6b4f;
+  --brand-hover: #0b5a42;
+  --brand-soft: #e6f2ec;
+  --brand-ink: #0b5f46;
   --on-brand: #ffffff;
-  --good: #137a4b;
-  --good-soft: #e2f4ea;
-  --warn: #9a5b00;
-  --warn-soft: #fdf1da;
-  --warn-line: #eab255;
+  --good: #0e6b4f;
+  --good-soft: #e6f2ec;
+  --warn: #8a5300;
+  --warn-soft: #fcf3de;
+  --warn-line: #e5bc6a;
   --bad: #b3261e;
-  --bad-soft: #fbe8e6;
-  --info: #1d5fb8;
-  --info-soft: #e6effb;
-  --chart-income: #0d9488;
-  --chart-expense: #d97706;
-  --chart-grid: #e6ebed;
-  --shadow-card: 0 1px 2px rgb(16 28 36 / 0.05);
-  --shadow-pop: 0 12px 32px -8px rgb(16 28 36 / 0.22);
+  --bad-soft: #fbeae7;
+  --info: #3f4a5a;
+  --info-soft: #eeede7;
+  --chart-income: #0c7a58;
+  --chart-expense: #4b72ae;
+  --chart-grid: #eeece6;
+  --elev-card: 0 0 0 1px rgb(15 27 45 / 0.05), 0 1px 2px rgb(15 27 45 / 0.04);
+  --elev-pop: 0 0 0 1px rgb(15 27 45 / 0.05), 0 16px 40px -12px rgb(15 27 45 / 0.22);
   color-scheme: light;
 }
 
 [data-theme='dark'] {
-  --canvas: #0b1219;
-  --surface: #111a24;
-  --surface-2: #17222e;
-  --surface-3: #202d3a;
-  --line: #233140;
-  --line-strong: #344556;
-  --ink: #e8eef2;
-  --ink-2: #a7b5c0;
-  --ink-3: #8294a2;
-  --brand: #17a398;
-  --brand-hover: #1cb5a9;
-  --brand-soft: #10302f;
-  --brand-ink: #5eead4;
-  --on-brand: #04201e;
-  --good: #4ade80;
-  --good-soft: #12301f;
-  --warn: #fbbf4d;
-  --warn-soft: #33260c;
-  --warn-line: #a9771c;
-  --bad: #f88a80;
-  --bad-soft: #3a1a18;
-  --info: #7fb2f5;
-  --info-soft: #152a45;
-  --chart-income: #10a89a;
-  --chart-expense: #d07c08;
-  --chart-grid: #233140;
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3);
-  --shadow-pop: 0 16px 40px -8px rgb(0 0 0 / 0.6);
+  --canvas: #121311;
+  --surface: #191a18;
+  --surface-2: #212320;
+  --surface-3: #2b2d29;
+  --line: #2a2c28;
+  --line-strong: #3d403a;
+  --ink: #f2f1ec;
+  --ink-2: #c4c3ba;
+  --ink-3: #a09f95;
+  --brand: #34ae84;
+  --brand-hover: #3fbe93;
+  --brand-soft: #16291f;
+  --brand-ink: #6fd3ac;
+  --on-brand: #06160f;
+  --good: #6fd3ac;
+  --good-soft: #16291f;
+  --warn: #f0bc5e;
+  --warn-soft: #2f2510;
+  --warn-line: #8f6b22;
+  --bad: #f2908a;
+  --bad-soft: #35191a;
+  --info: #c4c3ba;
+  --info-soft: #262824;
+  --chart-income: #2ea67f;
+  --chart-expense: #6d93d6;
+  --chart-grid: #2a2c28;
+  --elev-card: 0 0 0 1px rgb(255 255 255 / 0.04), 0 1px 2px rgb(0 0 0 / 0.3);
+  --elev-pop: 0 0 0 1px rgb(255 255 255 / 0.06), 0 18px 44px -10px rgb(0 0 0 / 0.65);
   color-scheme: dark;
 }
 
 @theme inline {
-  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-sans: 'Inter Tight Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-display: 'Instrument Serif', Georgia, 'Times New Roman', serif;
   --color-canvas: var(--canvas);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
@@ -93,8 +95,8 @@
   --color-bad-soft: var(--bad-soft);
   --color-info: var(--info);
   --color-info-soft: var(--info-soft);
-  --shadow-card: var(--shadow-card);
-  --shadow-pop: var(--shadow-pop);
+  --shadow-card: var(--elev-card);
+  --shadow-pop: var(--elev-pop);
 }
 
 html {
@@ -105,11 +107,11 @@ body {
   margin: 0;
   background: var(--canvas);
   color: var(--ink);
-  font-family: var(--font-sans);
-  font-size: 14px;
+  font-family: 'Inter Tight Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 15px;
   line-height: 1.5;
-  font-feature-settings: 'cv11', 'ss03';
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s;
 }
 
 button,
@@ -129,79 +131,103 @@ select:disabled {
 }
 
 dialog::backdrop {
-  background: rgb(8 15 22 / 0.5);
-  backdrop-filter: blur(2px);
+  background: rgb(15 27 45 / 0.4);
+  backdrop-filter: blur(3px);
 }
 
 .num {
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: 'tnum';
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum', 'lnum';
 }
 
-/* Inputs share one look across every form. */
-.field-input {
-  width: 100%;
-  height: 36px;
-  padding: 0 10px;
-  font-size: 14px;
-  color: var(--ink);
-  background: var(--surface);
-  border: 1px solid var(--line-strong);
-  border-radius: 8px;
-  transition: border-color 0.12s, box-shadow 0.12s;
-}
-.field-input::placeholder {
-  color: var(--ink-3);
-}
-.field-input:focus {
-  outline: none;
-  border-color: var(--brand);
-  box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 22%, transparent);
-}
-.field-input:disabled {
-  background: var(--surface-2);
-  color: var(--ink-2);
-}
-textarea.field-input {
-  height: auto;
-  padding: 8px 10px;
-  resize: vertical;
+/* In the components layer so width, alignment and tint utilities can override these. */
+@layer components {
+  /* Inputs share one look across every form. */
+  .field-input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 14.5px;
+    color: var(--ink);
+    background-color: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  }
+  .field-input:hover:not(:disabled) {
+    border-color: var(--ink-3);
+  }
+  .field-input::placeholder {
+    color: var(--ink-3);
+  }
+  .field-input:focus {
+    outline: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 20%, transparent);
+  }
+  .field-input:disabled {
+    background-color: var(--surface-2);
+    border-color: var(--line);
+    color: var(--ink-2);
+  }
+  select.field-input {
+    appearance: none;
+    padding-right: 32px;
+    text-overflow: ellipsis;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a8a82' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 11px center;
+  }
+  textarea.field-input {
+    height: auto;
+    padding: 8px 12px;
+    resize: vertical;
+  }
+
+  /* Data tables, set like a ledger: strong header rule, faint zebra, no cell borders. */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14.5px;
+  }
+  .data-table th {
+    padding: 10px 16px;
+    text-align: left;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-2);
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+  .data-table td {
+    padding: 13px 16px;
+    vertical-align: middle;
+  }
+  .data-table th:first-child,
+  .data-table td:first-child {
+    padding-left: 20px;
+  }
+  .data-table th:last-child,
+  .data-table td:last-child {
+    padding-right: 20px;
+  }
+  .data-table tbody tr {
+    transition: background-color 0.12s;
+  }
+  .data-table tbody tr:nth-child(even) {
+    background-color: color-mix(in srgb, var(--surface-2) 50%, transparent);
+  }
+  .data-table tbody tr:hover {
+    background-color: var(--surface-2);
+  }
+  .data-table tbody tr.row-link {
+    cursor: pointer;
+  }
 }
 
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: var(--line-strong) transparent;
-}
-
-/* Data tables */
-.data-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-.data-table th {
-  padding: 10px 14px;
-  text-align: left;
-  font-size: 12px;
-  font-weight: 550;
-  color: var(--ink-3);
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-.data-table td {
-  padding: 11px 14px;
-  border-bottom: 1px solid var(--line);
-  vertical-align: middle;
-}
-.data-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-.data-table tbody tr.row-link {
-  cursor: pointer;
-  transition: background 0.1s;
-}
-.data-table tbody tr.row-link:hover {
-  background: var(--surface-2);
 }
 
 /* Motion */
@@ -251,7 +277,7 @@ textarea.field-input {
   }
 }
 .page-enter {
-  animation: rise 0.22s ease-out;
+  animation: rise 0.28s cubic-bezier(0.2, 0.7, 0.3, 1);
 }
 .toast-enter {
   animation: toast-in 0.2s ease-out;
@@ -263,7 +289,7 @@ textarea.field-input {
   background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.6s linear infinite;
-  border-radius: 6px;
+  border-radius: 8px;
 }
 .scan-line {
   position: absolute;
@@ -291,16 +317,19 @@ textarea.field-input {
   [data-theme='dark'] {
     --canvas: #fff;
     --surface: #fff;
-    --surface-2: #f3f5f6;
-    --surface-3: #e6ebed;
-    --line: #d7dde1;
-    --line-strong: #c9d1d6;
-    --ink: #101c24;
-    --ink-2: #39464e;
-    --ink-3: #5a6871;
-    --chart-income: #0d9488;
-    --chart-expense: #d97706;
-    --chart-grid: #e6ebed;
+    --surface-2: #f4f3ee;
+    --surface-3: #eae8e1;
+    --line: #dedcd4;
+    --line-strong: #c9c6bb;
+    --ink: #0f1b2d;
+    --ink-2: #3f4a5a;
+    --ink-3: #5c6573;
+    --brand: #0e6b4f;
+    --brand-ink: #0b5f46;
+    --chart-income: #0c7a58;
+    --chart-expense: #4b72ae;
+    --chart-grid: #eeece6;
+    --elev-card: none;
     color-scheme: light;
   }
   .no-print {

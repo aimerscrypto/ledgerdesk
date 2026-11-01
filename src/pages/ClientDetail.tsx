@@ -1,9 +1,9 @@
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, ArrowLeftRight, BarChart3, BookOpenText, Building2, Check, Circle, FileText, Landmark, Mail, MapPin, Phone, TrendingDown, TrendingUp, User, Wallet } from 'lucide-react'
+import { ArrowLeft, ArrowLeftRight, BarChart3, BookOpenText, Building2, Check, Circle, FileText, Landmark, Mail, MapPin, Phone, User } from 'lucide-react'
 import { closeStatus, docFields, summarise } from '../lib/selectors'
 import { useAppState } from '../lib/store'
-import { dueLabel, fmtAmount, fmtDate, fmtMoney, fmtPeriod, timeAgo } from '../lib/format'
-import { Avatar, Badge, Card, CardHeader, EmptyState, KPI, LinkButton, PageHeader, ProgressBar, StatusBadge, cx } from '../components/ui'
+import { dueLabel, fmtDate, fmtPeriod, timeAgo } from '../lib/format'
+import { Avatar, Badge, Card, CardHeader, EmptyState, LinkButton, Money, PageHeader, ProgressBar, StatusBadge, SummaryStrip, cx } from '../components/ui'
 
 export default function ClientDetail() {
   const { id } = useParams()
@@ -66,13 +66,15 @@ export default function ClientDetail() {
         }
       />
 
-      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <KPI label={`Income, ${fmtPeriod(period)}`} value={fmtMoney(summary.income)} icon={TrendingUp} />
-        <KPI label={`Expenses, ${fmtPeriod(period)}`} value={fmtMoney(summary.expenses)} icon={TrendingDown} />
-        <KPI label="Net" value={fmtMoney(summary.net)} icon={Wallet} tone={summary.net < 0 ? 'bad' : 'good'} />
-      </div>
+      <SummaryStrip
+        items={[
+          { label: `Income, ${fmtPeriod(period)}`, value: <Money value={summary.income} /> },
+          { label: `Expenses, ${fmtPeriod(period)}`, value: <Money value={summary.expenses} /> },
+          { label: 'Net', value: <Money value={summary.net} />, tone: summary.net < 0 ? 'bad' : undefined },
+        ]}
+      />
 
-      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader title="Recent documents" description={`${state.documents.filter((d) => d.clientId === client.id).length} on file`} />
           {docs.length ? (
@@ -82,9 +84,7 @@ export default function ClientDetail() {
                 return (
                   <li key={doc.id}>
                     <Link to={`/review/${doc.id}`} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-2 sm:px-5">
-                      <span className="hidden size-8 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-ink-3 sm:inline-flex">
-                        <FileText size={15} aria-hidden />
-                      </span>
+                      <FileText size={16} className="hidden shrink-0 text-ink-3 sm:block" aria-hidden />
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium text-ink">{fields?.vendor || doc.filename}</p>
                         <p className="truncate text-[13px] text-ink-3">
@@ -92,7 +92,7 @@ export default function ClientDetail() {
                         </p>
                       </div>
                       <StatusBadge status={doc.status} />
-                      {fields && <span className="num hidden w-28 shrink-0 text-right font-medium text-ink sm:block">{`${fields.currency} ${fmtAmount(fields.total)}`}</span>}
+                      {fields && <Money value={fields.total} currency={fields.currency} className="hidden w-32 shrink-0 text-right font-medium text-ink sm:block" />}
                     </Link>
                   </li>
                 )
@@ -103,7 +103,7 @@ export default function ClientDetail() {
           )}
         </Card>
 
-        <div className="space-y-5">
+        <div className="space-y-6">
           <Card>
             <CardHeader
               title="Month-end close"
@@ -115,7 +115,7 @@ export default function ClientDetail() {
               <ul className="mt-4 space-y-2.5">
                 {status.steps.map((step) => (
                   <li key={step.label} className="flex items-center gap-2.5">
-                    <span className={cx('inline-flex size-5 shrink-0 items-center justify-center rounded-full', step.done ? 'bg-good text-white' : 'bg-surface-3 text-ink-3')}>
+                    <span className={cx('inline-flex size-5 shrink-0 items-center justify-center rounded-full', step.done ? 'bg-brand text-on-brand' : 'bg-surface-3 text-ink-3')}>
                       {step.done ? <Check size={12} aria-hidden /> : <Circle size={7} aria-hidden />}
                     </span>
                     <span className={cx('min-w-0 flex-1', step.done ? 'text-ink-2' : 'font-medium text-ink')}>{step.label}</span>
@@ -133,7 +133,7 @@ export default function ClientDetail() {
                 <div key={row.label} className="flex gap-2.5">
                   <row.icon size={15} className="mt-0.5 shrink-0 text-ink-3" aria-hidden />
                   <div className="min-w-0">
-                    <dt className="text-xs text-ink-3">{row.label}</dt>
+                    <dt className="text-[13px] text-ink-3">{row.label}</dt>
                     <dd className="break-words text-ink">{row.value}</dd>
                   </div>
                 </div>

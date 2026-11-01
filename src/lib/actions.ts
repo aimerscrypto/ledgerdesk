@@ -72,9 +72,7 @@ function finishExtraction(docId: string, extraction: DocRecord['extraction']) {
   const event: [AuditAction, string, { name: string; role: 'system' }] =
     extraction.source === 'fireworks'
       ? ['ai_extraction', `Extracted ${summary} via ${extractionLabel(extraction)}`, SYSTEM_ACTOR]
-      : extraction.source === 'seed'
-        ? ['seed_import', `Imported ${summary}`, { name: IMPORT_ACTOR, role: 'system' }]
-        : ['demo_extraction', `Filled ${summary} via ${extractionLabel(extraction)}`, { name: IMPORT_ACTOR, role: 'system' }]
+      : ['demo_extraction', `Filled ${summary} via ${extractionLabel(extraction)}`, { name: IMPORT_ACTOR, role: 'system' }]
   setState((s) => withAudit(patchDoc(s, docId, { status: 'needs_review', extraction }), [...event, { clientId: doc.clientId, docId }]))
   toast.info(`${doc.filename} has been read`, 'It is now waiting for the accountant to review it.')
 }
@@ -115,7 +113,8 @@ export function startProcessing() {
     void (async () => {
       await pause(6000)
       if (doc.paper) {
-        finishExtraction(doc.id, extractionFromPaper(doc.paper, doc.id))
+        // Read live in this session, so it logs as a fill. "Imported" is only for seeded history.
+        finishExtraction(doc.id, { ...extractionFromPaper(doc.paper, doc.id), source: 'mock', fallbackReason: 'unreachable' })
       } else {
         const stored = getPreview(doc.id)
         finishExtraction(doc.id, stored ? await extractDocument(stored, doc.filename) : mockExtraction(doc.filename, 'unreachable'))

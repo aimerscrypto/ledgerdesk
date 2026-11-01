@@ -1,14 +1,14 @@
 import { useState } from 'react'
-import { Download, FileText, Info, PieChart, Printer, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { Download, FileText, Info, PieChart, Printer } from 'lucide-react'
 import { logExport } from '../lib/actions'
 import { downloadText, toCsv, type CsvCell } from '../lib/csv'
-import { fmtAmount, fmtMoney, fmtPeriod, toKYD } from '../lib/format'
+import { fmtAmount, fmtPeriod, toKYD } from '../lib/format'
 import { useSelectedClient, useSelectedPeriod } from '../lib/hooks'
 import { clientPeriods, docFields, summarise, trend } from '../lib/selectors'
 import { useAppState } from '../lib/store'
 import { toast } from '../lib/toast'
 import { CategoryBars, IncomeExpenseChart } from '../components/charts'
-import { Button, Card, CardHeader, ClientPicker, EmptyState, KPI, LinkButton, PageHeader, Segmented, Select } from '../components/ui'
+import { Button, Card, CardHeader, ClientPicker, EmptyState, FilterBar, LinkButton, Money, PageHeader, Segmented, Select, SummaryStrip } from '../components/ui'
 
 type Mode = 'chart' | 'table'
 
@@ -66,10 +66,10 @@ export default function Reports() {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-        <div className="flex flex-wrap items-center gap-2">
+      <FilterBar className="justify-between">
+        <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 sm:flex-none">
           <ClientPicker clients={state.clients} value={client.id} onChange={select} />
-          <Select aria-label="Period" value={period} onChange={(e) => selectPeriod(e.target.value)} className="sm:w-44">
+          <Select aria-label="Period" value={period} onChange={(e) => selectPeriod(e.target.value)} className="min-w-0 flex-1 basis-32 sm:w-44 sm:flex-none sm:basis-auto">
             {periods.map((p) => (
               <option key={p} value={p}>
                 {fmtPeriod(p)}
@@ -86,22 +86,24 @@ export default function Reports() {
             { value: 'table', label: 'Tables' },
           ]}
         />
-      </div>
+      </FilterBar>
 
       {waiting > 0 && (
-        <p className="mb-4 flex items-start gap-2 rounded-lg border border-warn-line bg-warn-soft px-3 py-2 text-[13px] text-ink">
+        <p className="mb-6 flex items-start gap-2 rounded-lg bg-warn-soft px-3.5 py-2.5 text-[13.5px] text-ink">
           <Info size={15} className="mt-0.5 shrink-0 text-warn" aria-hidden />
           {waiting} {waiting === 1 ? 'document dated this month is' : 'documents dated this month are'} still awaiting review and not included below.
         </p>
       )}
 
-      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <KPI label="Income" value={fmtMoney(summary.income)} icon={TrendingUp} />
-        <KPI label="Expenses" value={fmtMoney(summary.expenses)} icon={TrendingDown} />
-        <KPI label="Net" value={fmtMoney(summary.net)} icon={Wallet} tone={summary.net < 0 ? 'bad' : 'good'} hint={summary.income > 0 ? `${Math.round((summary.net / summary.income) * 100)}% of income` : undefined} />
-      </div>
+      <SummaryStrip
+        items={[
+          { label: 'Income', value: <Money value={summary.income} /> },
+          { label: 'Expenses', value: <Money value={summary.expenses} /> },
+          { label: 'Net', value: <Money value={summary.net} />, tone: summary.net < 0 ? 'bad' : undefined, hint: summary.income > 0 ? `${Math.round((summary.net / summary.income) * 100)}% of income` : undefined },
+        ]}
+      />
 
-      <div className="grid items-start gap-5 xl:grid-cols-2">
+      <div className="grid items-start gap-6 xl:grid-cols-2">
         <Card>
           <CardHeader title="Income vs expenses" description="Last six months, in KYD. Select a month to view it." />
           {mode === 'chart' ? (
@@ -173,9 +175,9 @@ export default function Reports() {
           {summary.incomeByCategory.length ? (
             <ul className="divide-y divide-line">
               {summary.incomeByCategory.map((row) => (
-                <li key={row.category} className="flex items-center justify-between gap-4 px-4 py-2.5 sm:px-5">
+                <li key={row.category} className="flex items-center justify-between gap-4 px-4 py-3 sm:px-5">
                   <span className="min-w-0 truncate text-ink">{row.category}</span>
-                  <span className="num shrink-0 font-medium text-ink">{fmtMoney(row.amount)}</span>
+                  <Money value={row.amount} className="shrink-0 font-medium text-ink" />
                 </li>
               ))}
             </ul>

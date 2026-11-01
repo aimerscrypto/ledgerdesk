@@ -46,7 +46,7 @@ export function IncomeExpenseChart({ data, selected, onSelect, height = 250 }: {
   const { ref, width } = useWidth()
   const [hover, setHover] = useState<number | null>(null)
 
-  const margin = { top: 12, right: 4, bottom: 26, left: 44 }
+  const margin = { top: 12, right: 4, bottom: 26, left: 48 }
   const plotW = Math.max(40, width - margin.left - margin.right)
   const plotH = height - margin.top - margin.bottom
   const base = margin.top + plotH
@@ -69,14 +69,14 @@ export function IncomeExpenseChart({ data, selected, onSelect, height = 250 }: {
           <LegendSwatch color="var(--chart-expense)" /> Expenses
           {focus && <span className="num font-medium text-ink">{fmtMoney(focus.expenses)}</span>}
         </span>
-        {focus && <span className="text-xs text-ink-3">{fmtPeriod(focus.period)}</span>}
+        {focus && <span className="text-[13px] text-ink-3">{fmtPeriod(focus.period)}</span>}
       </div>
       <div ref={ref} className="relative">
         <svg width={width} height={height} role="img" aria-label={`Income and expenses by month in KYD, ${fmtPeriod(data[0].period)} to ${fmtPeriod(data[data.length - 1].period)}`} className="block">
           {ticks.map((t) => (
             <g key={t}>
               <line x1={margin.left} x2={width - margin.right} y1={y(t)} y2={y(t)} stroke="var(--chart-grid)" />
-              <text x={margin.left - 8} y={y(t)} dy="0.32em" textAnchor="end" fontSize={11} fill="var(--ink-3)" className="num">
+              <text x={margin.left - 8} y={y(t)} dy="0.32em" textAnchor="end" fontSize={12} fill="var(--ink-3)" className="num">
                 {compactMoney(t)}
               </text>
             </g>
@@ -91,7 +91,7 @@ export function IncomeExpenseChart({ data, selected, onSelect, height = 250 }: {
                   <path d={barPath(center - barW - 1, y(d.income), barW, base)} fill="var(--chart-income)" />
                   <path d={barPath(center + 1, y(d.expenses), barW, base)} fill="var(--chart-expense)" />
                 </g>
-                <text x={center} y={height - 8} textAnchor="middle" fontSize={11.5} fontWeight={d.period === selected ? 600 : 400} fill={d.period === selected ? 'var(--ink)' : 'var(--ink-3)'}>
+                <text x={center} y={height - 8} textAnchor="middle" fontSize={12} fontWeight={d.period === selected ? 600 : 400} fill={d.period === selected ? 'var(--ink)' : 'var(--ink-3)'}>
                   {fmtPeriod(d.period, true)}
                 </text>
                 <rect
@@ -120,7 +120,7 @@ export function IncomeExpenseChart({ data, selected, onSelect, height = 250 }: {
         </svg>
         {active && hover !== null && (
           <div
-            className="pointer-events-none absolute z-10 w-48 rounded-lg border border-line bg-surface p-2.5 text-[13px] shadow-pop"
+            className="pointer-events-none absolute z-10 w-48 rounded-xl bg-surface p-3 text-[13px] shadow-pop"
             style={{ top: 8, left: Math.min(Math.max(0, margin.left + band * hover + band / 2 - 96), Math.max(0, width - 192)) }}
           >
             <p className="mb-1 font-semibold text-ink">{fmtPeriod(active.period)}</p>
@@ -171,7 +171,7 @@ export function CategoryBars({ data, total, limit = 8 }: { data: Array<{ categor
               <span className="block h-full rounded-r bg-[var(--chart-expense)] transition-opacity group-hover:opacity-85" style={{ width: `${Math.max(1, (r.amount / max) * 100)}%` }} />
             </span>
             <span className="num text-right text-[13px] font-medium text-ink">{fmtMoney(r.amount)}</span>
-            <span className={cx('pointer-events-none absolute -top-7 left-1/2 z-10 hidden -translate-x-1/2 rounded-md border border-line bg-surface px-2 py-1 text-xs whitespace-nowrap text-ink-2 shadow-pop group-hover:block group-focus:block')}>
+            <span className={cx('pointer-events-none absolute -top-7 left-1/2 z-10 hidden -translate-x-1/2 rounded-md bg-surface px-2 py-1 text-[13px] whitespace-nowrap text-ink-2 shadow-pop group-hover:block group-focus:block')}>
               {share}% of expenses, {r.count} {r.count === 1 ? 'entry' : 'entries'}
             </span>
           </li>

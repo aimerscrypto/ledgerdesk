@@ -77,7 +77,7 @@ export default function ReportPrint() {
         </Button>
       </div>
 
-      <article className="print-sheet mx-auto max-w-[800px] rounded-xl border border-line bg-surface p-5 shadow-card sm:p-9">
+      <article className="print-sheet mx-auto max-w-[800px] rounded-2xl bg-surface p-5 shadow-card sm:p-9">
         <header className="flex flex-wrap items-start justify-between gap-4 border-b border-line pb-5">
           <div>
             <p className="font-semibold text-ink">{FIRM.name}</p>
@@ -89,7 +89,7 @@ export default function ReportPrint() {
 
         <div className="mt-5">
           <p className="text-[13px] text-ink-3">Month-end report</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-ink">{client.name}</h1>
+          <h1 className="font-display text-[36px] leading-tight text-ink">{client.name}</h1>
           <p className="text-ink-2">{fmtPeriod(period)}</p>
         </div>
 
@@ -99,15 +99,15 @@ export default function ReportPrint() {
             ['Expenses', summary.expenses],
             ['Net', summary.net],
           ].map(([label, value]) => (
-            <div key={label} className="rounded-lg border border-line px-3 py-2.5">
+            <div key={label}>
               <dt className="text-[13px] text-ink-3">{label}</dt>
-              <dd className="num mt-0.5 font-semibold text-ink sm:text-lg">{fmtMoney(value as number)}</dd>
+              <dd className="num mt-1 font-display text-[20px] text-ink sm:text-[26px]">{fmtMoney(value as number)}</dd>
             </div>
           ))}
         </dl>
 
         {waiting > 0 && (
-          <p className="mt-4 rounded-lg border border-line px-3 py-2 text-[13px] text-ink-2">
+          <p className="mt-4 rounded-lg bg-surface-2 px-3 py-2 text-[13px] text-ink-2">
             Excludes {waiting} {waiting === 1 ? 'document' : 'documents'} dated this month and still awaiting review.
           </p>
         )}

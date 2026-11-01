@@ -1,15 +1,15 @@
 import { useMemo, useRef, useState, type DragEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { CheckCircle2, ChevronRight, Clock3, FileText, FileUp, Image as ImageIcon, Loader2, MessagesSquare, Search, Sparkles, UploadCloud } from 'lucide-react'
+import { ChevronRight, FileText, FileUp, Image as ImageIcon, Loader2, MessagesSquare, Search, Sparkles, UploadCloud } from 'lucide-react'
 import { uploadDocument } from '../lib/actions'
 import { MAX_UPLOAD_MB, isAcceptedFile } from '../lib/images'
 import { clientById, docFields, threadsFor } from '../lib/selectors'
 import { useAppState } from '../lib/store'
 import { toast } from '../lib/toast'
-import { fmtAmount, timeAgo } from '../lib/format'
+import { timeAgo } from '../lib/format'
 import type { DocRecord, DocStatus } from '../lib/types'
 import { DocStepper } from '../components/DocStepper'
-import { Badge, Button, Card, CardHeader, EmptyState, KPI, PageHeader, Pager, Segmented, StatusBadge, cx, usePaged } from '../components/ui'
+import { Badge, Button, Card, CardHeader, EmptyState, Money, PageHeader, Pager, Segmented, StatusBadge, SummaryStrip, cx, usePaged } from '../components/ui'
 
 const SAMPLES = [
   { file: 'harbour-fuel-receipt.png', label: 'Fuel receipt', detail: 'Harbour Fuel & Marine' },
@@ -27,9 +27,7 @@ function DocRow({ doc, unread, messages }: { doc: DocRecord; unread: number; mes
   return (
     <li>
       <Link to={`/portal/doc/${doc.id}`} className="group flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-2 sm:px-5">
-        <span className="hidden size-10 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-ink-3 sm:inline-flex">
-          <Icon size={18} aria-hidden />
-        </span>
+        <Icon size={18} className="hidden shrink-0 text-ink-3 sm:block" aria-hidden />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
             <p className="min-w-0 truncate font-medium text-ink">{fields?.vendor || doc.filename}</p>
@@ -48,7 +46,7 @@ function DocRow({ doc, unread, messages }: { doc: DocRecord; unread: number; mes
           <DocStepper status={doc.status} className="mt-2.5 max-w-md" />
         </div>
         <div className="hidden shrink-0 text-right sm:block">
-          {fields ? <p className="num font-medium text-ink">{`${fields.currency} ${fmtAmount(fields.total)}`}</p> : <p className="text-[13px] text-ink-3">Reading…</p>}
+          {fields ? <Money value={fields.total} currency={fields.currency} className="font-medium text-ink" /> : <p className="text-[13px] text-ink-3">Reading…</p>}
         </div>
         <ChevronRight size={16} className="shrink-0 text-ink-3 transition-transform group-hover:translate-x-0.5" aria-hidden />
       </Link>
@@ -132,14 +130,16 @@ export default function Portal() {
     <div>
       <PageHeader title={client.name} description="Send your receipts and invoices here. You'll see each one move through review, and any questions stay attached to the document." />
 
-      <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KPI label="Processing" value={count('processing')} icon={Clock3} hint="Being read now" />
-        <KPI label="With your accountant" value={count('needs_review')} icon={Search} tone={count('needs_review') ? 'warn' : undefined} hint="Waiting for review" />
-        <KPI label="Approved" value={count('approved')} icon={CheckCircle2} tone="good" hint="Posted to your books" />
-        <KPI label="Unread messages" value={[...threads.values()].reduce((n, t) => n + t.unread, 0)} icon={MessagesSquare} to="/messages" hint="Open your messages" />
-      </div>
+      <SummaryStrip
+        items={[
+          { label: 'Processing', value: count('processing'), hint: 'Being read now' },
+          { label: 'With your accountant', value: count('needs_review'), tone: count('needs_review') ? 'warn' : undefined, hint: 'Waiting for review' },
+          { label: 'Approved', value: count('approved'), hint: 'Posted to your books' },
+          { label: 'Unread messages', value: [...threads.values()].reduce((n, t) => n + t.unread, 0), to: '/messages', hint: 'Open your messages' },
+        ]}
+      />
 
-      <Card className="mb-5">
+      <Card className="mb-6">
         <div
           role="button"
           tabIndex={0}
@@ -167,11 +167,11 @@ export default function Portal() {
             dragging ? 'border-brand bg-brand-soft' : 'border-line-strong hover:bg-surface-2',
           )}
         >
-          <span className={cx('mb-3 inline-flex size-12 items-center justify-center rounded-xl', dragging ? 'bg-brand text-on-brand' : 'bg-brand-soft text-brand-ink')}>
+          <span className={cx('mb-3 inline-flex size-12 items-center justify-center rounded-full', dragging ? 'bg-brand text-on-brand' : 'bg-brand-soft text-brand-ink')}>
             {preparing > 0 ? <Loader2 size={22} className="animate-spin" aria-hidden /> : <UploadCloud size={22} aria-hidden />}
           </span>
-          <p className="font-semibold text-ink">{dragging ? 'Drop to upload' : preparing > 0 ? `Uploading ${preparing} ${preparing === 1 ? 'document' : 'documents'}…` : 'Drag receipts and invoices here'}</p>
-          <p className="mt-1 text-[13px] text-ink-3">Images or PDFs, up to {MAX_UPLOAD_MB} MB each. AI reads them first, then your accountant checks every one.</p>
+          <p className="font-display text-[26px] leading-tight text-ink">{dragging ? 'Drop to upload' : preparing > 0 ? `Uploading ${preparing} ${preparing === 1 ? 'document' : 'documents'}…` : 'Drag receipts and invoices here'}</p>
+          <p className="mt-1.5 text-[14px] text-ink-2">Images or PDFs, up to {MAX_UPLOAD_MB} MB each. AI reads them first, then your accountant checks every one.</p>
           <span className="mt-4">
             <Button
               variant="primary"

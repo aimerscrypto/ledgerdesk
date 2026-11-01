@@ -17,7 +17,7 @@ import type {
 import { addMonths, convert, createRng, isoDate, lastDayOf, parseDate, periodOf, round2, type Rng } from './format'
 import { autoMatch } from './matching'
 
-export const STATE_VERSION = 2
+export const STATE_VERSION = 3
 export const ACCOUNTANT = 'Marcia Ebanks'
 const STAFF = 'Devon Tibbetts'
 export const AI_ACTOR = 'LedgerDesk AI'

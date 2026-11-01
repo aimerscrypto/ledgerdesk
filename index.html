@@ -5,15 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="LedgerDesk replaces spreadsheets and email for small accounting firms: AI-assisted document capture, human-approved posting, bank reconciliation and month-end reporting." />
-    <meta name="theme-color" content="#0b5f5a" />
+    <meta name="theme-color" content="#fafaf7" />
     <title>LedgerDesk</title>
     <script>
-      // Applied before first paint so dark mode never flashes.
+      // Applied before first paint so dark mode never flashes. Light is the default.
       (function () {
         var pref = null
         try { pref = localStorage.getItem('ledgerdesk:theme') } catch (e) {}
-        var dark = pref === 'dark' || (pref !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches)
-        document.documentElement.dataset.theme = dark ? 'dark' : 'light'
+        document.documentElement.dataset.theme = pref === 'dark' ? 'dark' : 'light'
       })()
     </script>
   </head>

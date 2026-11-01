@@ -8,7 +8,7 @@ import { clientById } from '../lib/selectors'
 import { useAppState } from '../lib/store'
 import { toast } from '../lib/toast'
 import type { AuditAction } from '../lib/types'
-import { Avatar, Badge, Button, Card, EmptyState, PageHeader, Pager, Select, usePaged, type Tone } from '../components/ui'
+import { Avatar, Badge, Button, Card, EmptyState, FilterBar, PageHeader, Pager, Select, usePaged, type Tone } from '../components/ui'
 
 const ACTIONS: Record<AuditAction, { label: string; tone: Tone }> = {
   upload: { label: 'Upload', tone: 'neutral' },
@@ -62,7 +62,7 @@ export default function Audit() {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <FilterBar>
         <input type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search details or users" aria-label="Search the audit log" className="field-input min-w-48 flex-1 sm:max-w-72" />
         <Select aria-label="Filter by action" value={action} onChange={(e) => setAction(e.target.value as 'all' | AuditAction)} className="sm:w-48">
           <option value="all">All actions</option>
@@ -80,10 +80,10 @@ export default function Audit() {
             </option>
           ))}
         </Select>
-      </div>
+      </FilterBar>
 
       <Card>
-        <div className="flex items-center gap-2 border-b border-line px-4 py-2.5 text-[13px] text-ink-2 sm:px-5">
+        <div className="flex items-center gap-2 px-4 pt-4 pb-2 text-[13.5px] text-ink-2 sm:px-5">
           <ShieldCheck size={15} className="shrink-0 text-ink-3" aria-hidden />
           <span>
             The log is append-only: entries can't be edited or removed, and only a demo reset clears it. <span className="num">{state.audit.length}</span> events recorded.

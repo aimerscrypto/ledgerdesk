@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { AlertTriangle, CheckCircle2, ClipboardCheck, Loader2, MessagesSquare, ShieldCheck } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, MessagesSquare, ShieldCheck } from 'lucide-react'
 import { LOW_CONFIDENCE, clientById, docFields, reviewQueue, threadsFor } from '../lib/selectors'
 import { useAppState } from '../lib/store'
-import { fmtAmount, timeAgo } from '../lib/format'
-import { Badge, Card, CardHeader, ConfidenceChip, EmptyState, KPI, PageHeader, Pager, Select, usePaged } from '../components/ui'
+import { timeAgo } from '../lib/format'
+import { Badge, Card, CardHeader, ConfidenceChip, EmptyState, Money, PageHeader, Pager, Select, SummaryStrip, usePaged } from '../components/ui'
 
 export default function ReviewList() {
   const state = useAppState()
@@ -34,11 +34,13 @@ export default function ReviewList() {
         }
       />
 
-      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <KPI label="Waiting for you" value={queue.length} icon={ClipboardCheck} tone={queue.length ? 'warn' : 'good'} hint={`Across ${new Set(queue.map((d) => d.clientId)).size} clients`} />
-        <KPI label="Low-confidence reads" value={lowConfidence} icon={AlertTriangle} tone={lowConfidence ? 'warn' : undefined} hint="Need a closer look" />
-        <KPI label="Being read now" value={processing.length} icon={Loader2} hint={processing.length ? 'Will join the queue shortly' : 'Nothing in progress'} />
-      </div>
+      <SummaryStrip
+        items={[
+          { label: 'Waiting for you', value: queue.length, tone: queue.length ? 'warn' : undefined, hint: `Across ${new Set(queue.map((d) => d.clientId)).size} clients` },
+          { label: 'Low-confidence reads', value: lowConfidence, tone: lowConfidence ? 'warn' : undefined, hint: 'Need a closer look' },
+          { label: 'Being read now', value: processing.length, hint: processing.length ? 'Will join the queue shortly' : 'Nothing in progress' },
+        ]}
+      />
 
       <Card>
         <CardHeader title="Documents to review" description="Oldest first" />
@@ -69,7 +71,7 @@ export default function ReviewList() {
                         </Link>
                         <span className="block truncate text-xs text-ink-3">{doc.filename}</span>
                       </td>
-                      <td className="num text-right font-medium text-ink">{fields ? `${fields.currency} ${fmtAmount(fields.total)}` : '—'}</td>
+                      <td className="text-right font-medium text-ink">{fields ? <Money value={fields.total} currency={fields.currency} /> : '—'}</td>
                       <td>
                         <span className="inline-flex items-center gap-1.5">
                           {doc.extraction && <ConfidenceChip value={doc.extraction.confidence} />}

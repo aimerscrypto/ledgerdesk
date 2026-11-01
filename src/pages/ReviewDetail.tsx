@@ -56,7 +56,7 @@ const EMPTY_FIELDS: DocFields = { vendor: '', date: '', invoiceNumber: '', subto
 
 function Notice({ tone, icon: Icon, children, action }: { tone: 'warn' | 'info'; icon: typeof Info; children: ReactNode; action?: ReactNode }) {
   return (
-    <div className={cx('flex flex-wrap items-start gap-x-2 gap-y-1.5 rounded-lg border px-3 py-2 text-[13px]', tone === 'warn' ? 'border-warn-line bg-warn-soft text-ink' : 'border-line bg-surface-2 text-ink-2')}>
+    <div className={cx('flex flex-wrap items-start gap-x-2 gap-y-1.5 rounded-lg px-3.5 py-2.5 text-[13.5px]', tone === 'warn' ? 'bg-warn-soft text-ink' : 'bg-surface-2 text-ink-2')}>
       <Icon size={15} className={cx('mt-0.5 shrink-0', tone === 'warn' ? 'text-warn' : 'text-ink-3')} aria-hidden />
       <span className="min-w-0 flex-1 basis-48">{children}</span>
       {action}
@@ -102,7 +102,7 @@ function ReviewForm({ doc, onDone }: { doc: DocRecord; onDone: () => void }) {
 
   const categories: string[] = (CATEGORIES as readonly string[]).includes(form.category) || !form.category ? [...CATEGORIES] : [form.category, ...CATEGORIES]
 
-  /** Wraps a field with its confidence chip, "edited" trail and low-confidence highlight. */
+  /** Wraps a field with its confidence note, "edited" trail and low-confidence highlight. */
   const fieldProps = (key: ExtractedField, label: string, error?: string) => {
     const id = `${baseId}-${key}`
     const wasEdited = !readOnly && edited(key)
@@ -114,7 +114,7 @@ function ReviewForm({ doc, onDone }: { doc: DocRecord; onDone: () => void }) {
         htmlFor: id,
         error: touched ? error : undefined,
         hint: wasEdited ? `AI read: ${originalValue}` : undefined,
-        aside: readOnly || !extraction ? undefined : wasEdited ? <Badge tone="info">Edited</Badge> : flagged(key) ? <ConfidenceChip value={extraction.fieldConfidence[key]} /> : undefined,
+        aside: readOnly || !extraction ? undefined : wasEdited ? <Badge tone="info">Edited</Badge> : flagged(key) ? <span className="num text-[13px] font-medium whitespace-nowrap text-warn">{Math.round(extraction.fieldConfidence[key] * 100)}% confidence</span> : undefined,
       },
       className: cx(!readOnly && flagged(key) && 'border-warn-line! bg-warn-soft!'),
       'aria-invalid': touched && error ? true : undefined,
@@ -167,7 +167,7 @@ function ReviewForm({ doc, onDone }: { doc: DocRecord; onDone: () => void }) {
         }
         action={extraction ? <span className="inline-flex items-center gap-1.5 text-[13px] text-ink-3">Overall <ConfidenceChip value={extraction.confidence} /></span> : undefined}
       />
-      <div className="space-y-4 p-4 sm:px-5">
+      <div className="space-y-5 px-4 pt-2 pb-5 sm:px-5">
         {doc.status === 'approved' && (
           <Notice tone="info" icon={ShieldCheck}>
             Approved by {doc.reviewedBy}
@@ -278,16 +278,16 @@ function ReviewForm({ doc, onDone }: { doc: DocRecord; onDone: () => void }) {
         )}
 
         {readOnly ? null : (
-          <div className="border-t border-line pt-4">
+          <div className="pt-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Button variant="primary" icon={Check} onClick={approve} className="flex-1 sm:flex-none">
+              <Button variant="primary" size="lg" icon={Check} onClick={approve} className="min-w-60 flex-1">
                 Approve and post to ledger
               </Button>
-              <Button variant="danger" icon={X} onClick={() => setRejecting(true)} className="flex-1 sm:flex-none">
+              <Button variant="danger" size="lg" icon={X} onClick={() => setRejecting(true)} className="flex-1 sm:flex-none">
                 Reject
               </Button>
             </div>
-            <p className="mt-2 text-xs text-ink-3">
+            <p className="mt-3 text-[13px] text-ink-2">
               Nothing posts until you approve.
               {flaggedLeft > 0 ? ` ${flaggedLeft} highlighted ${flaggedLeft === 1 ? 'field has' : 'fields have'} not been changed, so please check ${flaggedLeft === 1 ? 'it' : 'them'} against the document.` : ''}
               {touched && !valid ? ' Fix the fields marked above to continue.' : ''}
@@ -359,7 +359,7 @@ export default function ReviewDetail() {
 
   return (
     <div>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <LinkButton to="/review" variant="ghost" size="sm" icon={ArrowLeft} className="-ml-2.5">
           Review queue
         </LinkButton>
@@ -374,10 +374,10 @@ export default function ReviewDetail() {
         )}
       </div>
 
-      <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-        <h1 className="min-w-0 truncate text-xl font-semibold tracking-tight text-ink">{docFields(doc)?.vendor || doc.filename}</h1>
+      <div className="mb-6 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+        <h1 className="min-w-0 truncate font-display text-[34px] leading-[1.15] text-ink sm:text-[40px]">{docFields(doc)?.vendor || doc.filename}</h1>
         <StatusBadge status={doc.status} />
-        <p className="w-full text-[13px] text-ink-3">
+        <p className="w-full text-[13.5px] text-ink-3">
           <Link to={`/clients/${doc.clientId}`} className="font-medium text-ink-2 hover:underline">
             {client?.name}
           </Link>{' '}
@@ -385,11 +385,11 @@ export default function ReviewDetail() {
         </p>
       </div>
 
-      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)]">
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
         <div className="xl:sticky xl:top-[72px]">
           <DocumentPreview doc={doc} fill />
         </div>
-        <div className="space-y-5">
+        <div className="space-y-6">
           {doc.status === 'processing' ? (
             <Card>
               <EmptyState compact icon={Loader2} title="Still reading this document" body="The fields appear here as soon as the AI has finished. Nothing has been posted." />

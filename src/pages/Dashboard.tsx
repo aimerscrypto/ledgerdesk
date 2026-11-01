@@ -3,8 +3,6 @@ import { Link } from 'react-router-dom'
 import {
   ArrowLeftRight,
   ArrowRight,
-  Building2,
-  CalendarClock,
   CheckCircle2,
   ClipboardCheck,
   Download,
@@ -18,9 +16,9 @@ import {
 } from 'lucide-react'
 import { clientById, closeStatus, docFields, isOpenLine, reviewQueue } from '../lib/selectors'
 import { useAppState } from '../lib/store'
-import { dueLabel, daysUntil, fmtAmount, fmtDate, fmtPeriod, timeAgo } from '../lib/format'
+import { dueLabel, daysUntil, fmtDate, fmtPeriod, timeAgo } from '../lib/format'
 import type { AuditAction } from '../lib/types'
-import { Avatar, Badge, Card, CardHeader, ConfidenceChip, EmptyState, KPI, LinkButton, PageHeader, ProgressBar, type Tone } from '../components/ui'
+import { Avatar, Badge, Card, CardHeader, ConfidenceChip, EmptyState, LinkButton, Money, ProgressBar, SummaryStrip, type Tone } from '../components/ui'
 
 const ACTIVITY: Record<AuditAction, typeof Upload> = {
   upload: FileUp,
@@ -64,31 +62,39 @@ export default function Dashboard() {
 
   return (
     <div>
-      <PageHeader
-        title="Dashboard"
-        description={`${fmtPeriod(state.closePeriod)} close is in progress. Here's what needs you today.`}
-        actions={
-          <LinkButton to="/review" variant="primary" icon={ClipboardCheck}>
+      <section className="mb-10">
+        <p className="mb-3 text-[13px] font-medium text-ink-2">{fmtPeriod(state.closePeriod)} close in progress</p>
+        <div className="mb-8 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
+          <h1 className="max-w-4xl font-display text-[44px] leading-[1.04] text-ink sm:text-[64px]">
+            {queue.length ? (
+              <>
+                <span className="num text-brand-ink">{queue.length}</span> {queue.length === 1 ? 'document needs' : 'documents need'} you today
+              </>
+            ) : (
+              'Nothing needs you today'
+            )}
+          </h1>
+          <LinkButton to="/review" variant="primary" icon={ClipboardCheck} className="mb-2">
             Open review queue
           </LinkButton>
-        }
-      />
-
-      <div className="mb-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <KPI label="Active clients" value={state.clients.length} icon={Building2} to="/clients" hint="Cayman businesses" />
-        <KPI label="Waiting for review" value={queue.length} icon={ClipboardCheck} tone={queue.length ? 'warn' : 'good'} to="/review" hint={processing ? `${processing} more being read` : 'Nothing posts until approved'} />
-        <KPI label="Unreconciled items" value={open} icon={ArrowLeftRight} tone={open ? 'warn' : 'good'} to="/reconciliation" hint={open ? `Across ${clientsWithOpen} ${clientsWithOpen === 1 ? 'client' : 'clients'}` : 'All lines resolved'} />
-        <KPI
-          label="Next deadline"
-          value={next ? fmtDate(next.client.monthEndDue).slice(0, 6) : '—'}
-          icon={CalendarClock}
-          tone={atRisk ? 'bad' : undefined}
-          hint={atRisk ? `${atRisk} ${atRisk === 1 ? 'client' : 'clients'} at risk` : next ? next.client.name : undefined}
+        </div>
+        <SummaryStrip
+          className="mb-0"
+          items={[
+            { label: 'Active clients', value: state.clients.length, to: '/clients', hint: 'Cayman businesses' },
+            { label: 'Being read now', value: processing, to: '/review', hint: 'Nothing posts until approved' },
+            { label: 'Unreconciled items', value: open, to: '/reconciliation', hint: open ? `Across ${clientsWithOpen} ${clientsWithOpen === 1 ? 'client' : 'clients'}` : 'All lines resolved' },
+            {
+              label: 'Next deadline',
+              value: next ? fmtDate(next.client.monthEndDue).slice(0, 6) : '—',
+              hint: atRisk ? <span className="font-medium text-warn">{atRisk} {atRisk === 1 ? 'client' : 'clients'} at risk</span> : next?.client.name,
+            },
+          ]}
         />
-      </div>
+      </section>
 
-      <div className="grid items-start gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
-        <div className="space-y-5">
+      <div className="grid items-start gap-x-10 gap-y-8 xl:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
+        <div className="space-y-8">
           <Card>
             <CardHeader
               title="Review queue"
@@ -107,7 +113,7 @@ export default function Dashboard() {
                   const fields = docFields(doc)
                   return (
                     <li key={doc.id}>
-                      <Link to={`/review/${doc.id}`} className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-surface-2 sm:px-5">
+                      <Link to={`/review/${doc.id}`} className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-2 sm:px-5">
                         <Avatar name={clientById(state, doc.clientId)?.name ?? '?'} size="sm" />
                         <div className="min-w-0 flex-1">
                           <p className="truncate font-medium text-ink">{fields?.vendor || doc.filename}</p>
@@ -116,7 +122,7 @@ export default function Dashboard() {
                           </p>
                         </div>
                         {doc.extraction && <ConfidenceChip value={doc.extraction.confidence} />}
-                        {fields && <span className="num hidden w-28 shrink-0 text-right font-medium text-ink sm:block">{`${fields.currency} ${fmtAmount(fields.total)}`}</span>}
+                        {fields && <Money value={fields.total} currency={fields.currency} className="hidden w-32 shrink-0 text-right font-medium text-ink sm:block" />}
                       </Link>
                     </li>
                   )
@@ -127,15 +133,15 @@ export default function Dashboard() {
             )}
           </Card>
 
-          <Card>
+          <Card plain>
             <CardHeader title="Month-end deadlines" description={`${fmtPeriod(state.closePeriod)} close, soonest first`} />
-            <ul className="divide-y divide-line">
+            <ul>
               {deadlines.map(({ client, status }) => {
                 const health = HEALTH[status.health]
                 const days = daysUntil(client.monthEndDue)
                 return (
                   <li key={client.id}>
-                    <Link to={`/clients/${client.id}`} className="block px-4 py-3 transition-colors hover:bg-surface-2 sm:px-5">
+                    <Link to={`/clients/${client.id}`} className="block rounded-xl px-4 py-3 transition-colors hover:bg-surface-2 sm:px-5">
                       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
                         <p className="min-w-0 truncate font-medium text-ink">{client.name}</p>
                         <div className="flex items-center gap-2">
@@ -160,7 +166,7 @@ export default function Dashboard() {
           </Card>
         </div>
 
-        <Card>
+        <Card plain>
           <CardHeader
             title="Recent activity"
             description="From the audit log"
@@ -170,14 +176,12 @@ export default function Dashboard() {
               </LinkButton>
             }
           />
-          <ul className="divide-y divide-line">
+          <ul>
             {activity.map((event) => {
               const Icon = ACTIVITY[event.action]
               return (
-                <li key={event.id} className="flex gap-3 px-4 py-3 sm:px-5">
-                  <span className="mt-0.5 inline-flex size-7 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-ink-2">
-                    <Icon size={14} aria-hidden />
-                  </span>
+                <li key={event.id} className="flex gap-3 px-4 py-2.5 sm:px-5">
+                  <Icon size={16} className="mt-0.5 shrink-0 text-ink-3" aria-hidden />
                   <div className="min-w-0">
                     <p className="line-clamp-2 text-[13px] text-ink">{event.detail}</p>
                     <p className="mt-0.5 truncate text-xs text-ink-3">

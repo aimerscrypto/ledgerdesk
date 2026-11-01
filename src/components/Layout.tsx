@@ -29,9 +29,9 @@ import type { Role } from '../lib/types'
 
 export function Logo() {
   return (
-    <span className="inline-flex items-center gap-2">
-      <img src="/favicon.svg" alt="" className="size-7 rounded-lg" />
-      <span className="text-[15px] font-semibold tracking-tight text-ink">LedgerDesk</span>
+    <span className="inline-flex items-center gap-2.5">
+      <img src="/favicon.svg" alt="" className="size-[26px] rounded-[7px]" />
+      <span className="font-display text-[25px] leading-none text-ink">LedgerDesk</span>
     </span>
   )
 }
@@ -61,12 +61,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const accountant = state.session.role === 'accountant'
   return (
     <div className="flex h-full flex-col">
-      <div className="flex h-14 items-center px-4">
+      <div className="flex h-[72px] items-center px-5">
         <Link to="/" onClick={onNavigate} aria-label="LedgerDesk home">
           <Logo />
         </Link>
       </div>
-      <nav aria-label="Main" className="flex-1 space-y-0.5 overflow-y-auto px-2.5 py-2">
+      <nav aria-label="Main" className="flex-1 space-y-0.5 overflow-y-auto px-3 py-2">
         {items.map((item) => (
           <NavLink
             key={item.to}
@@ -75,20 +75,23 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             onClick={onNavigate}
             className={({ isActive }) =>
               cx(
-                'flex h-9 items-center gap-2.5 rounded-lg px-2.5 text-sm font-medium transition-colors',
-                isActive ? 'bg-brand-soft text-brand-ink' : 'text-ink-2 hover:bg-surface-2 hover:text-ink',
+                'flex h-10 items-center gap-3 rounded-lg px-3 text-[14.5px] font-medium transition-colors duration-150',
+                isActive ? 'bg-surface-3/70 text-ink [&_svg]:text-brand-ink' : 'text-ink-2 hover:bg-surface-2 hover:text-ink',
               )
             }
           >
-            <item.icon size={16} aria-hidden />
+            <item.icon size={17} aria-hidden />
             <span className="min-w-0 flex-1 truncate">{item.label}</span>
-            {item.count > 0 && <span className="num rounded-md bg-surface-3 px-1.5 text-xs font-semibold text-ink-2">{item.count}</span>}
+            {item.count > 0 && <span className="num text-[13px] font-medium text-ink-3">{item.count}</span>}
           </NavLink>
         ))}
       </nav>
-      <div className="border-t border-line px-4 py-3 text-xs text-ink-3">
-        <p className="font-medium text-ink-2">{accountant ? FIRM.name : 'Secure client portal'}</p>
-        <p className="mt-0.5">{accountant ? 'George Town, Grand Cayman' : `Provided by ${FIRM.name}`}</p>
+      <div className="flex items-center gap-3 px-5 py-5">
+        <Avatar name={FIRM.name} />
+        <div className="min-w-0 leading-snug">
+          <p className="truncate text-[13px] font-semibold text-ink">{accountant ? FIRM.name : 'Secure client portal'}</p>
+          <p className="truncate text-xs text-ink-3">{accountant ? 'George Town, Grand Cayman' : `Provided by ${FIRM.name}`}</p>
+        </div>
       </div>
     </div>
   )
@@ -118,7 +121,7 @@ function Toaster() {
       {toasts.map((t) => {
         const Icon = icons[t.kind]
         return (
-          <div key={t.id} className="toast-enter pointer-events-auto flex w-full gap-2.5 rounded-xl border border-line bg-surface p-3 shadow-pop">
+          <div key={t.id} className="toast-enter pointer-events-auto flex w-full gap-2.5 rounded-xl bg-surface p-3.5 shadow-pop">
             <Icon size={18} className={cx('mt-0.5 shrink-0', colors[t.kind])} aria-hidden />
             <div className="min-w-0 flex-1">
               <p className="font-medium break-words text-ink">{t.title}</p>
@@ -161,22 +164,22 @@ export function Layout() {
 
   return (
     <div className="min-h-dvh">
-      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-60 border-r border-line bg-surface lg:block">
+      <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-line bg-canvas lg:block">
         <SidebarContent />
       </aside>
 
       {drawer && (
         <div className="no-print fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <button type="button" aria-label="Close menu" className="absolute inset-0 bg-black/40" onClick={() => setDrawer(false)} />
-          <div className="drawer-enter absolute inset-y-0 left-0 w-64 max-w-[80vw] bg-surface shadow-pop">
+          <div className="drawer-enter absolute inset-y-0 left-0 w-64 max-w-[80vw] bg-canvas shadow-pop">
             <SidebarContent onNavigate={() => setDrawer(false)} />
           </div>
         </div>
       )}
 
-      <div className="lg:pl-60">
-        <header className="no-print sticky top-0 z-20 border-b border-line bg-surface/95 backdrop-blur">
-          <div className="flex min-h-14 flex-wrap items-center gap-x-2 gap-y-2 px-3 py-2 sm:px-5">
+      <div className="lg:pl-64">
+        <header className="no-print sticky top-0 z-20 border-b border-line/70 bg-canvas/85 backdrop-blur-md">
+          <div className="flex min-h-14 flex-wrap items-center gap-x-2 gap-y-2 px-3 py-2 sm:px-8">
             <IconButton label="Open menu" icon={Menu} onClick={() => setDrawer(true)} className="lg:hidden" />
             <span className="hidden text-xs font-medium text-ink-3 sm:inline">Demo view</span>
             <Segmented<Role>
@@ -201,11 +204,11 @@ export function Layout() {
                 </span>
               </span>
             </div>
-            {role === 'client' && <ClientPicker clients={state.clients} value={clientId} onChange={changeClient} label="Client to view as" className="order-last max-sm:w-full sm:order-none sm:ml-2" />}
+            {role === 'client' && <ClientPicker clients={state.clients} value={clientId} onChange={changeClient} label="Client to view as" className="order-last max-sm:basis-full sm:order-none sm:ml-2" />}
           </div>
         </header>
 
-        <main className="mx-auto max-w-[1320px] px-4 py-5 sm:px-6 sm:py-6">
+        <main className="mx-auto max-w-[1320px] px-4 py-7 sm:px-8 sm:py-10">
           <div key={location.pathname} className="page-enter">
             <Outlet />
           </div>

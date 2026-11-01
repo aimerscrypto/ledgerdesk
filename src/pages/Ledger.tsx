@@ -1,15 +1,15 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpenText, Check, Download, FileText, Landmark, Receipt, Search, TrendingDown, TrendingUp, Wallet } from 'lucide-react'
+import { BookOpenText, Check, Download, FileText, Landmark, Search } from 'lucide-react'
 import { logExport } from '../lib/actions'
 import { toCsv, downloadText, type CsvCell } from '../lib/csv'
-import { fmtAmount, fmtDate, fmtMoney, fmtPeriod, sumMoney, toKYD } from '../lib/format'
+import { fmtAmount, fmtDate, fmtPeriod, sumMoney, toKYD } from '../lib/format'
 import { useSelectedClient, useSelectedPeriod } from '../lib/hooks'
 import { clientPeriods } from '../lib/selectors'
 import { useAppState } from '../lib/store'
 import { toast } from '../lib/toast'
 import type { EntryType } from '../lib/types'
-import { Badge, Button, Card, CardHeader, ClientPicker, EmptyState, KPI, PageHeader, Pager, Segmented, Select, usePaged } from '../components/ui'
+import { Badge, Button, Card, CardHeader, ClientPicker, EmptyState, FilterBar, Money, PageHeader, Pager, Segmented, Select, SummaryStrip, usePaged } from '../components/ui'
 
 type TypeFilter = 'all' | EntryType
 
@@ -70,9 +70,9 @@ export default function Ledger() {
         }
       />
 
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <FilterBar>
         <ClientPicker clients={state.clients} value={client.id} onChange={select} />
-        <Select aria-label="Period" value={period} onChange={(e) => selectPeriod(e.target.value)} className="sm:w-44">
+        <Select aria-label="Period" value={period} onChange={(e) => selectPeriod(e.target.value)} className="min-w-0 flex-1 basis-32 sm:w-44 sm:flex-none sm:basis-auto">
           {periods.map((p) => (
             <option key={p} value={p}>
               {fmtPeriod(p)}
@@ -91,14 +91,16 @@ export default function Ledger() {
             { value: 'expense', label: 'Expenses' },
           ]}
         />
-      </div>
+      </FilterBar>
 
-      <div className="mb-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <KPI label="Income" value={fmtMoney(income)} icon={TrendingUp} />
-        <KPI label="Expenses" value={fmtMoney(expenses)} icon={TrendingDown} />
-        <KPI label="Net" value={fmtMoney(income - expenses)} icon={Wallet} tone={income - expenses < 0 ? 'bad' : 'good'} />
-        <KPI label="Entries" value={rows.length} icon={Receipt} hint="USD converted at 1 KYD = 1.20 USD" />
-      </div>
+      <SummaryStrip
+        items={[
+          { label: 'Income', value: <Money value={income} /> },
+          { label: 'Expenses', value: <Money value={expenses} /> },
+          { label: 'Net', value: <Money value={income - expenses} />, tone: income - expenses < 0 ? 'bad' : undefined },
+          { label: 'Entries', value: rows.length, hint: 'USD converted at 1 KYD = 1.20 USD' },
+        ]}
+      />
 
       <Card>
         <CardHeader title={client.name} description={periodLabel} />
@@ -111,7 +113,6 @@ export default function Ledger() {
                   <th>Vendor</th>
                   <th>Category</th>
                   <th className="text-right">Amount</th>
-                  <th>Currency</th>
                   <th className="text-right">KYD equivalent</th>
                   <th>Source</th>
                   <th>Reconciled</th>
@@ -128,11 +129,9 @@ export default function Ledger() {
                         {entry.invoiceNumber && <span className="num block truncate text-xs text-ink-3">{entry.invoiceNumber}</span>}
                       </td>
                       <td className="max-w-48 truncate text-ink-2">{entry.category}</td>
-                      <td className={`num whitespace-nowrap text-right font-medium ${entry.type === 'income' ? 'text-good' : 'text-ink'}`}>
-                        {sign}
-                        {fmtAmount(entry.amount)}
+                      <td className="whitespace-nowrap text-right font-medium">
+                        <Money value={entry.amount} currency={entry.currency} sign={sign} className={entry.type === 'income' ? 'text-good' : 'text-ink'} />
                       </td>
-                      <td className="text-ink-2">{entry.currency}</td>
                       <td className="num whitespace-nowrap text-right text-ink-2">{fmtAmount(toKYD(entry.amount, entry.currency))}</td>
                       <td className="whitespace-nowrap">
                         {entry.docId ? (

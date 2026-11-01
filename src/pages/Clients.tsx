@@ -25,7 +25,7 @@ export default function Clients() {
             const status = closeStatus(state, client.id)
             const done = status.steps.filter((s) => s.done).length
             return (
-              <Link key={client.id} to={`/clients/${client.id}`} className="block rounded-xl border border-line bg-surface p-4 shadow-card transition-colors hover:border-line-strong sm:p-5">
+              <Link key={client.id} to={`/clients/${client.id}`} className="block rounded-2xl bg-surface p-5 shadow-card transition-all duration-150 hover:-translate-y-px hover:shadow-pop sm:p-6">
                 <div className="flex items-start gap-3">
                   <Avatar name={client.name} />
                   <div className="min-w-0 flex-1">

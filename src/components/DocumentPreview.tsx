@@ -50,7 +50,7 @@ function usePaperDetail(paper: Paper) {
 
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
-    <div className={cx('flex justify-between gap-6', strong && 'mt-1 border-t border-slate-400 pt-1.5 text-[15px] font-semibold')}>
+    <div className={cx('flex justify-between gap-6', strong && 'mt-1 border-t border-stone-400 pt-1.5 text-[15px] font-semibold')}>
       <span>{label}</span>
       <span className="tabular-nums">{value}</span>
     </div>
@@ -64,19 +64,19 @@ function PaperDocument({ paper }: { paper: Paper }) {
 
   if (paper.template === 'receipt') {
     return (
-      <div className={cx('mx-auto w-[310px] px-6 py-7 font-mono text-[12.5px] leading-relaxed text-slate-800 shadow-md', paper.faint ? 'bg-[#f6f1df]' : 'bg-white')}>
+      <div className={cx('mx-auto w-[310px] px-6 py-7 font-mono text-[12.5px] leading-relaxed text-stone-800 shadow-lg', paper.faint ? 'bg-[#f6f1df]' : 'bg-white')}>
         <div style={faint}>
           <p className="text-center text-sm font-bold uppercase">{paper.vendor}</p>
           <p className="text-center text-[11px]">{d.address}</p>
           <p className="mb-3 text-center text-[11px]">{d.phone}</p>
-          <div className="mb-2 border-y border-dashed border-slate-400 py-1.5 text-[11.5px]">
+          <div className="mb-2 border-y border-dashed border-stone-400 py-1.5 text-[11.5px]">
             <Row label={fmtDate(paper.date)} value={d.time} />
             <Row label={`Receipt ${paper.number}`} value={`Till ${d.terminal}`} />
           </div>
           {d.lines.map((l) => (
             <Row key={l.label} label={l.label} value={fmtAmount(l.amount)} />
           ))}
-          <div className="mt-2 border-t border-dashed border-slate-400 pt-1.5">
+          <div className="mt-2 border-t border-dashed border-stone-400 pt-1.5">
             <Row label="Subtotal" value={fmtAmount(paper.subtotal)} />
             {paper.tax > 0 && <Row label="Tax" value={fmtAmount(paper.tax)} />}
             <Row label="TOTAL" value={money(paper.total)} strong />
@@ -89,48 +89,48 @@ function PaperDocument({ paper }: { paper: Paper }) {
 
   if (paper.template === 'utility') {
     return (
-      <div className="mx-auto w-[480px] max-w-full bg-white p-7 text-[13px] text-slate-800 shadow-md">
-        <div className="mb-5 flex items-start justify-between gap-4 border-b-2 border-slate-700 pb-3">
+      <div className="mx-auto w-[480px] max-w-full bg-white p-7 text-[13px] text-stone-800 shadow-lg">
+        <div className="mb-5 flex items-start justify-between gap-4 border-b-2 border-stone-700 pb-3">
           <div>
             <p className="text-lg font-bold">{paper.vendor}</p>
-            <p className="text-[11px] text-slate-600">{d.address}</p>
+            <p className="text-[11px] text-stone-600">{d.address}</p>
           </div>
           <p className="text-right text-[11px] font-semibold tracking-wide uppercase">Monthly bill</p>
         </div>
         <div className="mb-5 grid grid-cols-2 gap-2 text-[12px]">
           <p>
-            <span className="block text-slate-500">Bill to</span>
+            <span className="block text-stone-500">Bill to</span>
             {paper.billTo}
           </p>
           <p>
-            <span className="block text-slate-500">Account</span>
+            <span className="block text-stone-500">Account</span>
             {d.account}
           </p>
           <p>
-            <span className="block text-slate-500">Bill number</span>
+            <span className="block text-stone-500">Bill number</span>
             {paper.number}
           </p>
           <p>
-            <span className="block text-slate-500">Bill date</span>
+            <span className="block text-stone-500">Bill date</span>
             {fmtDate(paper.date)}
           </p>
         </div>
-        <div className="rounded border border-slate-300 p-3">
+        <div className="rounded border border-stone-300 p-3">
           <Row label="Current charges" value={money(paper.subtotal)} />
           <Row label="Amount due" value={money(paper.total)} strong />
         </div>
-        <p className="mt-4 text-[11px] text-slate-500">Paid by direct debit from your account on file.</p>
+        <p className="mt-4 text-[11px] text-stone-500">Paid by direct debit from your account on file.</p>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto w-[520px] max-w-full bg-white p-7 text-[13px] text-slate-800 shadow-md">
+    <div className="mx-auto w-[520px] max-w-full bg-white p-7 text-[13px] text-stone-800 shadow-lg">
       <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <p className="text-lg font-bold">{paper.template === 'sales' ? paper.billTo || paper.vendor : paper.vendor}</p>
-          <p className="text-[11px] text-slate-600">{d.address}</p>
-          <p className="text-[11px] text-slate-600">{d.phone}</p>
+          <p className="text-[11px] text-stone-600">{d.address}</p>
+          <p className="text-[11px] text-stone-600">{d.phone}</p>
         </div>
         <div className="text-right">
           <p className="text-base font-semibold tracking-wide uppercase">{paper.template === 'sales' ? 'Sales summary' : 'Invoice'}</p>
@@ -139,19 +139,19 @@ function PaperDocument({ paper }: { paper: Paper }) {
         </div>
       </div>
       <div className="mb-4 text-[12px]">
-        <span className="block text-slate-500">{paper.template === 'sales' ? 'Source' : 'Bill to'}</span>
+        <span className="block text-stone-500">{paper.template === 'sales' ? 'Source' : 'Bill to'}</span>
         {paper.template === 'sales' ? paper.vendor : paper.billTo}
       </div>
       <table className="mb-4 w-full text-[12.5px]">
         <thead>
-          <tr className="border-b border-slate-400 text-left text-[11px] text-slate-500 uppercase">
+          <tr className="border-b border-stone-400 text-left text-[11px] text-stone-500 uppercase">
             <th className="py-1.5 font-medium">Description</th>
             <th className="py-1.5 text-right font-medium">Amount</th>
           </tr>
         </thead>
         <tbody>
           {d.lines.map((l) => (
-            <tr key={l.label} className="border-b border-slate-200">
+            <tr key={l.label} className="border-b border-stone-200">
               <td className="py-1.5">{l.label}</td>
               <td className="py-1.5 text-right tabular-nums">{fmtAmount(l.amount)}</td>
             </tr>
@@ -163,34 +163,34 @@ function PaperDocument({ paper }: { paper: Paper }) {
         {paper.tax > 0 && <Row label="Sales tax" value={fmtAmount(paper.tax)} />}
         <Row label="Total" value={money(paper.total)} strong />
       </div>
-      {paper.template === 'invoice' && <p className="mt-6 text-[11px] text-slate-500">Payment terms: net 15 days. Please quote the invoice number with your payment.</p>}
+      {paper.template === 'invoice' && <p className="mt-6 text-[11px] text-stone-500">Payment terms: net 15 days. Please quote the invoice number with your payment.</p>}
     </div>
   )
 }
 
 export function DocumentPreview({ doc, fill }: { doc: DocRecord; fill?: boolean }) {
-  const [zoom, setZoom] = useState(1)
+  const [zoom, setZoom] = useState(fill ? 1.2 : 1)
   const stored = doc.hasStoredPreview ? getPreview(doc.id) : null
   const isPdf = doc.mime === 'application/pdf'
   const processing = doc.status === 'processing'
 
   return (
-    <div className="flex h-full flex-col overflow-hidden rounded-xl border border-line bg-surface shadow-card">
-      <div className="flex items-center gap-2 border-b border-line px-3 py-2">
-        <p className="min-w-0 flex-1 truncate text-[13px] font-medium text-ink-2" title={doc.filename}>
+    <div className="flex h-full flex-col overflow-hidden rounded-2xl bg-surface shadow-card">
+      <div className="flex items-center gap-2 px-4 py-2">
+        <p className="min-w-0 flex-1 truncate text-[13.5px] font-medium text-ink-2" title={doc.filename}>
           {doc.filename}
         </p>
         {isPdf && <Badge>PDF{stored ? ', page 1' : ''}</Badge>}
         <div className="flex items-center">
           <IconButton label="Zoom out" icon={Minus} className="size-7" onClick={() => setZoom((z) => Math.max(0.6, +(z - 0.2).toFixed(1)))} />
-          <span className="num w-10 text-center text-xs text-ink-3">{Math.round(zoom * 100)}%</span>
+          <span className="num w-11 text-center text-[13px] text-ink-3">{Math.round(zoom * 100)}%</span>
           <IconButton label="Zoom in" icon={Plus} className="size-7" onClick={() => setZoom((z) => Math.min(2, +(z + 0.2).toFixed(1)))} />
         </div>
       </div>
-      <div className={cx('scrollbar-thin relative flex-1 overflow-auto bg-surface-3 p-4 sm:p-6', fill ? 'min-h-[420px] xl:max-h-[calc(100dvh-210px)]' : 'max-h-[560px] min-h-[320px]')}>
+      <div className={cx('scrollbar-thin relative flex-1 overflow-auto bg-surface-2 p-4 sm:p-8', fill ? 'min-h-[560px] xl:h-[calc(100dvh-150px)]' : 'max-h-[560px] min-h-[320px]')}>
         <div style={{ zoom }}>
           {stored ? (
-            <img src={stored} alt={`Uploaded document: ${doc.filename}`} className="mx-auto max-w-full shadow-md" />
+            <img src={stored} alt={`Uploaded document: ${doc.filename}`} className={cx('mx-auto rounded-sm shadow-lg', fill ? 'w-full max-w-[760px]' : 'max-w-full')} />
           ) : doc.paper ? (
             <PaperDocument paper={doc.paper} />
           ) : (

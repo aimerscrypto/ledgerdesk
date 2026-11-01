@@ -14,7 +14,7 @@ import {
   type ImportResult,
 } from '../lib/actions'
 import { downloadText, parseStatementCsv } from '../lib/csv'
-import { convert, fmtAmount, fmtDate, fmtDateTime, fmtMoney, fmtPeriod, periodOf } from '../lib/format'
+import { convert, fmtDate, fmtDateTime, fmtMoney, fmtPeriod, periodOf } from '../lib/format'
 import { useSelectedClient, useSelectedPeriod } from '../lib/hooks'
 import { rankCandidates } from '../lib/matching'
 import { clientPeriods, docFields, isOpenLine } from '../lib/selectors'
@@ -22,7 +22,7 @@ import { useAppState } from '../lib/store'
 import { toast } from '../lib/toast'
 import { CATEGORIES } from '../../api/_lib/mock-extraction'
 import type { BankTxn, Client, DocRecord, LedgerEntry, MatchStatus } from '../lib/types'
-import { Badge, Button, Card, CardHeader, ClientPicker, EmptyState, Field, KPI, MatchBadge, Modal, PageHeader, ProgressBar, Segmented, Select, cx } from '../components/ui'
+import { Badge, Button, Card, CardHeader, ClientPicker, EmptyState, Field, FilterBar, MatchBadge, Modal, Money, PageHeader, ProgressBar, Segmented, Select, SummaryStrip, cx } from '../components/ui'
 
 type View = 'all' | MatchStatus
 
@@ -32,7 +32,7 @@ function EntrySummary({ entry }: { entry: LedgerEntry }) {
       <span className="font-medium text-ink">{entry.vendor}</span>
       <span className="text-ink-3">
         {' '}
-        · {fmtDate(entry.date)} · <span className="num">{`${entry.currency} ${fmtAmount(entry.amount)}`}</span>
+        · {fmtDate(entry.date)} · <Money value={entry.amount} currency={entry.currency} className="text-ink-2" />
       </span>
     </span>
   )
@@ -40,13 +40,15 @@ function EntrySummary({ entry }: { entry: LedgerEntry }) {
 
 function LineRow({ line, children, actions }: { line: BankTxn; children?: ReactNode; actions?: ReactNode }) {
   return (
-    <li className="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3 sm:px-5">
+    <li className="flex flex-wrap items-start gap-x-4 gap-y-2 px-4 py-3.5 transition-colors hover:bg-surface-2/60 sm:px-5">
       <div className="min-w-0 flex-1 basis-64">
         <p className="break-words font-medium text-ink">{line.description}</p>
         <p className="text-[13px] text-ink-3">{fmtDate(line.date)}</p>
         {children && <div className="mt-1.5 space-y-1 text-[13px] text-ink-2">{children}</div>}
       </div>
-      <p className={cx('num w-32 shrink-0 text-right font-medium', line.amount > 0 ? 'text-good' : 'text-ink')}>{fmtMoney(line.amount, line.currency)}</p>
+      <p className="w-36 shrink-0 text-right font-medium">
+        <Money value={line.amount} currency={line.currency} className={line.amount > 0 ? 'text-good' : 'text-ink'} />
+      </p>
       {actions && <div className="flex w-full flex-wrap justify-end gap-1.5 sm:w-auto">{actions}</div>}
     </li>
   )
@@ -148,7 +150,7 @@ function ImportDialog({ open, onClose, client, period, onImported }: { open: boo
             />
           </div>
           {error && (
-            <p role="alert" className="flex items-start gap-2 rounded-lg border border-warn-line bg-warn-soft px-3 py-2 text-[13px] text-ink">
+            <p role="alert" className="flex items-start gap-2 rounded-lg bg-warn-soft px-3 py-2 text-[13px] text-ink">
               <AlertTriangle size={15} className="mt-0.5 shrink-0 text-warn" aria-hidden />
               {error}
             </p>
@@ -357,16 +359,16 @@ export default function Reconciliation() {
           </Button>
         }
       />
-      <div className="mb-4 flex flex-wrap items-center gap-2">
+      <FilterBar>
         <ClientPicker clients={state.clients} value={client.id} onChange={select} />
-        <Select aria-label="Period" value={period} onChange={(e) => selectPeriod(e.target.value)} className="sm:w-44">
+        <Select aria-label="Period" value={period} onChange={(e) => selectPeriod(e.target.value)} className="min-w-0 flex-1 basis-32 sm:w-44 sm:flex-none sm:basis-auto">
           {periods.map((p) => (
             <option key={p} value={p}>
               {fmtPeriod(p)}
             </option>
           ))}
         </Select>
-      </div>
+      </FilterBar>
     </>
   )
 
@@ -412,38 +414,35 @@ export default function Reconciliation() {
     <div>
       {header}
 
-      <Card className="mb-4">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 sm:px-5">
-          <span className="inline-flex size-8 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-ink-2">
-            <Landmark size={15} aria-hidden />
-          </span>
-          <div className="min-w-0 flex-1 basis-56">
-            <p className="truncate font-medium text-ink">{statement?.filename ?? `${client.bankName} statement`}</p>
-            <p className="text-[13px] text-ink-3">
-              {client.bankName} ({client.bankCurrency}) · {lines.length} lines
-              {statement ? ` · imported ${fmtDateTime(statement.importedAt)} by ${statement.importedBy}` : ''}
-            </p>
-          </div>
-          <div className="w-full sm:w-56">
-            <div className="mb-1 flex justify-between text-[13px]">
-              <span className="text-ink-2">Reconciled</span>
-              <span className="num text-ink-3">
-                {resolved} of {lines.length}
-              </span>
-            </div>
-            <ProgressBar value={resolved / lines.length} tone={resolved === lines.length ? 'good' : 'brand'} label="Reconciliation progress" />
-          </div>
+      <div className="mb-8 flex flex-wrap items-center gap-x-6 gap-y-3 border-b border-line pb-6">
+        <div className="min-w-0 flex-1 basis-56">
+          <p className="truncate font-medium text-ink">{statement?.filename ?? `${client.bankName} statement`}</p>
+          <p className="text-[13px] text-ink-3">
+            {client.bankName} ({client.bankCurrency}) · {lines.length} lines
+            {statement ? ` · imported ${fmtDateTime(statement.importedAt)} by ${statement.importedBy}` : ''}
+          </p>
         </div>
-      </Card>
-
-      <div className="mb-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
-        <KPI label="Matched" value={matched.length} icon={CheckCircle2} tone="good" />
-        <KPI label="Suggested" value={suggested.length} icon={Sparkles} tone={suggested.length ? 'warn' : undefined} hint="Need your confirmation" />
-        <KPI label="Unmatched" value={unmatched.length} icon={AlertTriangle} tone={unmatched.length ? 'bad' : undefined} hint="Need attention" />
-        <KPI label="Excluded" value={excluded.length} icon={Ban} hint="No ledger entry needed" />
+        <div className="w-full sm:w-64">
+          <div className="mb-1.5 flex justify-between text-[13px]">
+            <span className="font-medium text-ink-2">Reconciled</span>
+            <span className="num text-ink-2">
+              {resolved} of {lines.length}
+            </span>
+          </div>
+          <ProgressBar value={resolved / lines.length} tone={resolved === lines.length ? 'good' : 'brand'} label="Reconciliation progress" />
+        </div>
       </div>
 
-      <div className="mb-4">
+      <SummaryStrip
+        items={[
+          { label: 'Matched', value: matched.length },
+          { label: 'Suggested', value: suggested.length, tone: suggested.length ? 'warn' : undefined, hint: 'Need your confirmation' },
+          { label: 'Unmatched', value: unmatched.length, tone: unmatched.length ? 'bad' : undefined, hint: 'Need attention' },
+          { label: 'Excluded', value: excluded.length, hint: 'No ledger entry needed' },
+        ]}
+      />
+
+      <div className="mb-5">
         <Segmented<View>
           label="Show lines"
           value={view}
@@ -459,7 +458,7 @@ export default function Reconciliation() {
       </div>
 
       {resolved === lines.length && view === 'all' && (
-        <p className="mb-4 flex items-center gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2 text-[13px] text-ink-2">
+        <p className="mb-5 flex items-center gap-2 rounded-lg bg-brand-soft px-3.5 py-2.5 text-[13.5px] text-ink">
           <CheckCircle2 size={15} className="shrink-0 text-good" aria-hidden />
           Every line on this statement is resolved.
           <Link className="font-medium text-brand-ink hover:underline" to={`/reports?client=${client.id}&period=${period}`}>
@@ -468,7 +467,7 @@ export default function Reconciliation() {
         </p>
       )}
 
-      <div className="space-y-5">
+      <div className="space-y-6">
         {show('suggested') && suggested.length > 0 && (
           <Card>
             <CardHeader title="Suggested matches" description="A likely fit, but not certain enough to match on its own" />
