@@ -145,8 +145,10 @@ function ReviewForm({ doc, onDone }: { doc: DocRecord; onDone: () => void }) {
     onDone()
   }
 
+  // These columns are too narrow for a label and its confidence side by side. If one stacks, all do, so the inputs stay level.
+  const stackMoney = Boolean(subtotal.field.aside || tax.field.aside || total.field.aside)
   const money = (key: 'subtotal' | 'tax' | 'total', props: typeof total) => (
-    <Field {...props.field}>
+    <Field {...props.field} stacked={stackMoney}>
       <input id={props.id} value={form[key]} inputMode="decimal" autoComplete="off" disabled={props.disabled} aria-invalid={props['aria-invalid']} className={cx('field-input num text-right', props.className)} onChange={(e) => set(key, e.target.value.replace(/[^0-9.,-]/g, ''))} />
     </Field>
   )

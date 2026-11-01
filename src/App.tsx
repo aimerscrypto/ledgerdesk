@@ -1,24 +1,46 @@
-import { Suspense, lazy } from 'react'
+import { Suspense, lazy, useEffect, type ComponentType } from 'react'
 import { Link, Navigate, Outlet, Route, Routes } from 'react-router-dom'
 import { Compass } from 'lucide-react'
 import { Layout } from './components/Layout'
 import { EmptyState, PageSkeleton, buttonClass } from './components/ui'
 import { useAppState } from './lib/store'
 import type { Role } from './lib/types'
+// The review queue is the app's main path and renders from local data, so it ships in the entry bundle.
+import ReviewDetail from './pages/ReviewDetail'
+import ReviewList from './pages/ReviewList'
 
-const Dashboard = lazy(() => import('./pages/Dashboard'))
-const Clients = lazy(() => import('./pages/Clients'))
-const ClientDetail = lazy(() => import('./pages/ClientDetail'))
-const ReviewList = lazy(() => import('./pages/ReviewList'))
-const ReviewDetail = lazy(() => import('./pages/ReviewDetail'))
-const Ledger = lazy(() => import('./pages/Ledger'))
-const Reconciliation = lazy(() => import('./pages/Reconciliation'))
-const Reports = lazy(() => import('./pages/Reports'))
-const ReportPrint = lazy(() => import('./pages/ReportPrint'))
-const Audit = lazy(() => import('./pages/Audit'))
-const Portal = lazy(() => import('./pages/Portal'))
-const PortalDoc = lazy(() => import('./pages/PortalDoc'))
-const PortalMessages = lazy(() => import('./pages/PortalMessages'))
+const pageLoaders: Array<() => Promise<unknown>> = []
+
+function page(load: () => Promise<{ default: ComponentType }>) {
+  pageLoaders.push(load)
+  return lazy(load)
+}
+
+const Dashboard = page(() => import('./pages/Dashboard'))
+const Clients = page(() => import('./pages/Clients'))
+const ClientDetail = page(() => import('./pages/ClientDetail'))
+const Ledger = page(() => import('./pages/Ledger'))
+const Reconciliation = page(() => import('./pages/Reconciliation'))
+const Reports = page(() => import('./pages/Reports'))
+const ReportPrint = page(() => import('./pages/ReportPrint'))
+const Audit = page(() => import('./pages/Audit'))
+const Portal = page(() => import('./pages/Portal'))
+const PortalDoc = page(() => import('./pages/PortalDoc'))
+const PortalMessages = page(() => import('./pages/PortalMessages'))
+
+/** Fetches the other pages once the browser is idle, so moving between them doesn't wait on the network. */
+function usePreloadPages() {
+  useEffect(() => {
+    // A failed preload is harmless: the route retries the import when it's opened.
+    const preload = () => pageLoaders.forEach((load) => void load().catch(() => {}))
+    if ('requestIdleCallback' in window) {
+      const handle = requestIdleCallback(preload)
+      return () => cancelIdleCallback(handle)
+    }
+    const handle = setTimeout(preload, 1000)
+    return () => clearTimeout(handle)
+  }, [])
+}
 
 const homeFor = (role: Role) => (role === 'client' ? '/portal' : '/dashboard')
 
@@ -54,6 +76,7 @@ function NotFound() {
 }
 
 export function App() {
+  usePreloadPages()
   return (
     <Routes>
       <Route path="/" element={<Home />} />

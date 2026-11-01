@@ -205,10 +205,10 @@ export function ConfidenceChip({ value }: { value: number }) {
   )
 }
 
-export function Field({ label, hint, error, children, htmlFor, aside }: { label: ReactNode; hint?: ReactNode; error?: ReactNode; children: ReactNode; htmlFor?: string; aside?: ReactNode }) {
+export function Field({ label, hint, error, children, htmlFor, aside, stacked }: { label: ReactNode; hint?: ReactNode; error?: ReactNode; children: ReactNode; htmlFor?: string; aside?: ReactNode; stacked?: boolean }) {
   return (
     <div>
-      <div className="mb-1.5 flex min-h-6 items-center justify-between gap-2">
+      <div className={cx('mb-1.5 flex', stacked ? 'min-h-11 flex-col items-start gap-0.5' : 'min-h-6 flex-wrap items-center justify-between gap-x-3 gap-y-0.5')}>
         <label htmlFor={htmlFor} className="text-[13px] font-medium text-ink-2">
           {label}
         </label>

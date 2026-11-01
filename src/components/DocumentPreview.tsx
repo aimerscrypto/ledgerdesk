@@ -170,7 +170,7 @@ function PaperDocument({ paper }: { paper: Paper }) {
 
 export function DocumentPreview({ doc, fill }: { doc: DocRecord; fill?: boolean }) {
   const [zoom, setZoom] = useState(fill ? 1.2 : 1)
-  const stored = doc.hasStoredPreview ? getPreview(doc.id) : null
+  const stored = useMemo(() => (doc.hasStoredPreview ? getPreview(doc.id) : null), [doc.id, doc.hasStoredPreview])
   const isPdf = doc.mime === 'application/pdf'
   const processing = doc.status === 'processing'
 
